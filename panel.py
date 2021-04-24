@@ -45,22 +45,28 @@ class Panel(tkinter.Frame):
         self.power_on = False
         self.power = tkinter.Button(self.root, text="POWER", bg="red", fg="white", command=self.toggle_power)
         self.power.grid(row=0, column=2, ipady=20)
+
         # Rotor CCW button
-        self.ccw = tkinter.Button(self.root, text="<- CCW", bd=3, bg="black", activebackground="yellow", fg="yellow", activeforeground="black", command=print("Hello"))
+        self.ccw = tkinter.Button(self.root, text="<- CCW", bd=3, bg="black", activebackground="yellow", fg="yellow", activeforeground="black")
         self.ccw.grid(row=6, column=0, ipadx=50, ipady=20)
         # Rotor CW button
-        self.ccw = tkinter.Button(self.root, text="CW ->", bd=3, bg="black", activebackground="yellow", fg="yellow", activeforeground="black", command=print("Hello"))
-        self.ccw.grid(row=6, column=1, ipadx=50, ipady=20)
+        self.cw = tkinter.Button(self.root, text="CW ->", bd=3, bg="black", activebackground="yellow", fg="yellow", activeforeground="black")
+        self.cw.grid(row=6, column=1, ipadx=50, ipady=20)
+        # Rotor actions. Must be function of one variable "event"
+        self.ccw.bind('<ButtonPress-1>', lambda event: self.start_rotor(direction='ccw'))
+        self.ccw.bind('<ButtonRelease-1>', lambda event: self.stop_rotor())
+        self.cw.bind('<ButtonPress-1>', lambda event: self.start_rotor(direction='cw'))
+        self.cw.bind('<ButtonRelease-1>', lambda event: self.stop_rotor())
         # Quit button
         self.quitBtn = tkinter.Button(self.root, text="Quit", fg="red", command=self.confirm_exit)
         self.quitBtn.grid(row=6, column=2)
         # Antenna selector
         self.antNo = tkinter.IntVar(self.root, 1)
-        self.ant1 = tkinter.Radiobutton(self.root, text = "Antenna 1", variable = self.antNo, value=1, indicator = 0)
-        self.ant2 = tkinter.Radiobutton(self.root, text = "Antenna 2", variable = self.antNo, value=2, indicator = 0)
-        self.ant3 = tkinter.Radiobutton(self.root, text = "Antenna 3", variable = self.antNo, value=3, indicator = 0)
-        self.ant4 = tkinter.Radiobutton(self.root, text = "Antenna 4", variable = self.antNo, value=4, indicator = 0)
-        self.ant5 = tkinter.Radiobutton(self.root, text = "Antenna 5", variable = self.antNo, value=5, indicator = 0)
+        self.ant1 = tkinter.Radiobutton(self.root, text = "Antenna 1", variable = self.antNo, value=1, indicator = 0, selectcolor="red", command=self.set_antenna)
+        self.ant2 = tkinter.Radiobutton(self.root, text = "Antenna 2", variable = self.antNo, value=2, indicator = 0, selectcolor="red", command=self.set_antenna)
+        self.ant3 = tkinter.Radiobutton(self.root, text = "Antenna 3", variable = self.antNo, value=3, indicator = 0, selectcolor="red", command=self.set_antenna)
+        self.ant4 = tkinter.Radiobutton(self.root, text = "Antenna 4", variable = self.antNo, value=4, indicator = 0, selectcolor="red", command=self.set_antenna)
+        self.ant5 = tkinter.Radiobutton(self.root, text = "Antenna 5", variable = self.antNo, value=5, indicator = 0, selectcolor="red", command=self.set_antenna)
         self.ant1.grid(row=1, column=2, ipadx=10, ipady=20)
         self.ant2.grid(row=2, column=2, ipadx=10, ipady=20)
         self.ant3.grid(row=3, column=2, ipadx=10, ipady=20)
@@ -79,11 +85,27 @@ class Panel(tkinter.Frame):
                 # Turn OFF
                 self.power_on = False
                 self.power["bg"] = "red"
+                print("You turned power OFF")
             else:
                 # Turn ON
                 self.power_on = True
                 self.power["bg"] = "green"
-        
+                print("You turned power ON")
+
+
+    def start_rotor(self, direction):
+        if direction == 'cw':
+            print("Starting to move CW")
+        elif direction == 'ccw':
+            print("Starting to move CCW")
+        else:
+            pass
+
+    def stop_rotor(self):
+        print("Stopping rotor")
+                    
+    def set_antenna(self):
+        print(f"You selected antenna: {self.antNo.get()}")
         
 if __name__ == '__main__':
     app=Panel(tkinter.Tk(), "SK2GJ Control Panel")
