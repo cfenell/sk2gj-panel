@@ -1,11 +1,13 @@
-# Control panel for SK2GJ
-# Based on https://solarianprogrammer.com/2018/04/21/python-opencv-show-video-tkinter-window/
+# Control panel for SK2GJ antenna remote control
+# Tkinter tutorials see https://www.geeksforgeeks.org/python-tkinter-tutorial/
+# Video code see https://solarianprogrammer.com/2018/04/21/python-opencv-show-video-tkinter-window/
+#
 # SM2YHP 2021
+# fredrik@kyla.kiruna.se
 
 import tkinter
 from tkinter.messagebox import askyesno
 from PIL import Image, ImageTk
-import time
 import webcam
 
 class Panel(tkinter.Frame):
@@ -27,12 +29,13 @@ class Panel(tkinter.Frame):
         # Create a canvas that can fit the above video source size
         self.videoDisplay = tkinter.Canvas(self.root, width = self.vid.width, height = self.vid.height)     
         self.videoDisplay.grid(row=1, column=0, rowspan=5, columnspan=2)
+        # Put a title above
         l = tkinter.Label(self.root, text="Remote control (C) SM2YHP", font =('calibri', 12, 'bold'))
         l.grid(row=0, column=0, columnspan=2, sticky=tkinter.S)
         self.delay = 15
        
     def update_video(self):
-        # Update thw video frame from the video source
+        # Update the video frame from the video source
         ret, frame = self.vid.get_frame()
         if ret:
             self.photo = ImageTk.PhotoImage(image = Image.fromarray(frame))
@@ -43,16 +46,15 @@ class Panel(tkinter.Frame):
         # Create the button widgets
         # Power relay button
         self.power_on = False
-        self.power = tkinter.Button(self.root, text="POWER", bg="red", fg="white", command=self.toggle_power)
+        self.power = tkinter.Button(self.root, text="POWER", bg="light gray", fg="white", command=self.toggle_power)
         self.power.grid(row=0, column=2, ipady=20)
-
         # Rotor CCW button
         self.ccw = tkinter.Button(self.root, text="<- CCW", bd=3, bg="black", activebackground="yellow", fg="yellow", activeforeground="black")
         self.ccw.grid(row=6, column=0, ipadx=50, ipady=20)
         # Rotor CW button
         self.cw = tkinter.Button(self.root, text="CW ->", bd=3, bg="black", activebackground="yellow", fg="yellow", activeforeground="black")
         self.cw.grid(row=6, column=1, ipadx=50, ipady=20)
-        # Rotor actions. Must be function of one variable "event"
+        # Rotor actions: move when buttons pressed. NB Must be function of one variable "event"
         self.ccw.bind('<ButtonPress-1>', lambda event: self.start_rotor(direction='ccw'))
         self.ccw.bind('<ButtonRelease-1>', lambda event: self.stop_rotor())
         self.cw.bind('<ButtonPress-1>', lambda event: self.start_rotor(direction='cw'))
@@ -73,27 +75,8 @@ class Panel(tkinter.Frame):
         self.ant4.grid(row=4, column=2, ipadx=10, ipady=20)
         self.ant5.grid(row=5, column=2, ipadx=10, ipady=20)
 
-    def confirm_exit(self):
-        answer = askyesno(title="Exit", message="Are you sure?")
-        if answer:
-            self.root.destroy()
-
-    def toggle_power(self):
-        answer = askyesno(title="Power relay", message=f"Really turn power relay {'OFF' if self.power_on else 'ON'}?")
-        if answer:
-            if self.power_on:
-                # Turn OFF
-                self.power_on = False
-                self.power["bg"] = "red"
-                print("You turned power OFF")
-            else:
-                # Turn ON
-                self.power_on = True
-                self.power["bg"] = "green"
-                print("You turned power ON")
-
-
     def start_rotor(self, direction):
+        # Turn on one of the rotor relays
         if direction == 'cw':
             print("Starting to move CW")
         elif direction == 'ccw':
@@ -102,11 +85,36 @@ class Panel(tkinter.Frame):
             pass
 
     def stop_rotor(self):
+        # Turn off rotor outputs
         print("Stopping rotor")
                     
     def set_antenna(self):
         print(f"You selected antenna: {self.antNo.get()}")
-        
+
+    def toggle_power(self):
+        # Confirmation dialogue
+        answer = askyesno(title="Power relay", message=f"Really turn power relay {'OFF' if self.power_on else 'ON'}?")
+        if answer:
+            if self.power_on:
+                # Turn OFF
+                self.power_on = False
+                self.power["bg"] = "gray"
+                print("You turned power OFF")
+            else:
+                # Turn ON
+                self.power_on = True
+                self.power["bg"] = "red"
+                print("You turned power ON")
+    
+    def confirm_exit(self):
+        # Confirmation dialogue
+        answer = askyesno(title="Exit", message="Are you sure?")
+        if answer:
+            # Stop application
+            self.root.destroy()
+
+### Main block
 if __name__ == '__main__':
+    # Start the application
     app=Panel(tkinter.Tk(), "SK2GJ Control Panel")
     app.mainloop()
